@@ -2,7 +2,7 @@ var express = require('express');
 var util = require('./lib/utility');
 var partials = require('express-partials');
 var bodyParser = require('body-parser');
-
+// require('node-monkey').start({ host: '127.0.0.1', port: '50500'});
 
 var db = require('./app/config');
 var Users = require('./app/collections/users');
@@ -75,6 +75,24 @@ function(req, res) {
 /************************************************************/
 // Write your authentication routes here
 /************************************************************/
+app.post('/login',
+  function(req, res) {
+    User.where('username', req.body.username).fetch().then(function(exists) {
+      if (exists) {
+        res.redirect('/');  
+      } else {
+        res.redirect('/login'); 
+      }
+      
+    });
+  });
+
+app.post('/signup',
+  function(req, res) {
+    new User(req.body).save().then(function() {
+      res.redirect('/');
+    });
+  });
 
 
 
