@@ -2,6 +2,7 @@ var express = require('express');
 var util = require('./lib/utility');
 var partials = require('express-partials');
 var bodyParser = require('body-parser');
+
 // require('node-monkey').start({ host: '127.0.0.1', port: '50500'});
 
 var db = require('./app/config');
@@ -21,6 +22,19 @@ app.use(bodyParser.json());
 // Parse forms (signup/login)
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(__dirname + '/public'));
+app.use(express.cookieParser('shhhh, very secret'));
+app.use(express.session());
+
+
+var restrict = function(req, res, next) {
+  if (req.session.user) {
+    next();
+  } else {
+    req.session.error = 'Access denied!';
+    res.redirect('/login');
+  }
+};
+
 
 
 app.get('/', 
