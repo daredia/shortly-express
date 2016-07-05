@@ -84,13 +84,15 @@ function(req, res) {
           console.log('Error reading URL heading: ', err);
           return res.sendStatus(404);
         }
-
+        console.log("current session user is ", req.session.user);
         Links.create({
           url: uri,
           title: title,
-          baseUrl: req.headers.origin
+          baseUrl: req.headers.origin,
+          uid: req.session.user
         })
         .then(function(newLink) {
+          console.log('made a new link');
           res.status(200).send(newLink);
         });
       });
