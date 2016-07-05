@@ -75,22 +75,33 @@ function(req, res) {
 /************************************************************/
 // Write your authentication routes here
 /************************************************************/
+app.get('/login', function(req, res) {
+  res.render('login');
+});
 app.post('/login',
   function(req, res) {
     User.where('username', req.body.username).fetch().then(function(exists) {
+      console.log(exists);
       if (exists) {
+        console.log('user exists');
         res.redirect('/');  
       } else {
+        console.log('user does not exist');
         res.redirect('/login'); 
       }
       
     });
   });
 
+app.get('/signup', function(req, res) {
+  res.render('signup');
+});
 app.post('/signup',
   function(req, res) {
     new User(req.body).save().then(function() {
       res.redirect('/');
+    }).catch(function(e) {
+      console.log('signup ERROR', e);
     });
   });
 
