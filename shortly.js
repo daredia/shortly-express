@@ -50,24 +50,23 @@ var restrict = function(req, res, next) {
 
 app.get('/', restrict, 
 function(req, res) {
-  debugger;
   console.log('in base');
   res.render('index');
 });
 
-app.get('/create', 
+app.get('/create', restrict,
 function(req, res) {
   res.render('index');
 });
 
-app.get('/links', 
+app.get('/links', restrict,
 function(req, res) {
   Links.reset().fetch().then(function(links) {
     res.status(200).send(links.models);
   });
 });
 
-app.post('/links', 
+app.post('/links', restrict,
 function(req, res) {
   var uri = req.body.url;
 
