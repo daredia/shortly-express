@@ -2,6 +2,9 @@ var express = require('express');
 var util = require('./lib/utility');
 var partials = require('express-partials');
 var bodyParser = require('body-parser');
+//var cookieParser = require('cookie-parser');
+//sessions no longer needs cookie parser for it to work since 1.5.0
+var session = require('express-session');
 
 // require('node-monkey').start({ host: '127.0.0.1', port: '50500'});
 
@@ -22,12 +25,21 @@ app.use(bodyParser.json());
 // Parse forms (signup/login)
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(__dirname + '/public'));
-app.use(express.cookieParser('shhhh, very secret'));
-app.use(express.session());
+//app.use(cookieParser('shhhh, very secret'));
+
+//set the secure to true when we handle https!!!!!!!!!!!
+app.use(session({
+  secret: 'shhhh, very secret',
+  resave: false,
+  saveUninitialized: true,
+  cookie: {secure: false}
+}));
 
 
 var restrict = function(req, res, next) {
+  console.log('~in restricted~');
   if (req.session.user) {
+    console.log('~Session found!~');
     next();
   } else {
     req.session.error = 'Access denied!';
@@ -36,9 +48,10 @@ var restrict = function(req, res, next) {
 };
 
 
-
-app.get('/', 
+app.get('/', restrict, 
 function(req, res) {
+  debugger;
+  console.log('in base');
   res.render('index');
 });
 
@@ -90,6 +103,7 @@ function(req, res) {
 // Write your authentication routes here
 /************************************************************/
 app.get('/login', function(req, res) {
+  console.log('open login page');
   res.render('login');
 });
 app.post('/login',
@@ -101,7 +115,12 @@ app.post('/login',
         user.checkPassword(req.body.password, user.attributes.password)
           .then(function(match) {
             if (match) {
-              res.redirect('/');
+              console.log('password matched');
+              req.session.regenerate(function() {
+                console.log('in request.session.regenerate');
+                req.session.user = user.attributes.username;
+                res.redirect('/');
+              });
             } else {
               res.redirect('/login');
             }
@@ -127,6 +146,13 @@ app.post('/signup',
       console.log('signup ERROR', e);
     });
   });
+
+
+app.get('/logout', function(req, res) {
+  req.session.destroy(function() {
+    res.redirect('/login');
+  });
+});
 
 
 
