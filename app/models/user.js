@@ -31,8 +31,16 @@ var User = db.Model.extend({
       });
     });
   },
-  checkPassword: function(model, ) {
-
+  checkPassword: function(attemptedPassword, hashedPassword) {
+    return new Promise(function(resolve, reject) {
+      bcrypt.compare(attemptedPassword, hashedPassword, function(err, res) {
+        if (err) { 
+          reject(err); 
+        } else {
+          resolve(res);
+        }
+      });
+    });
   }
 });
 

@@ -80,16 +80,25 @@ app.get('/login', function(req, res) {
 });
 app.post('/login',
   function(req, res) {
-    User.where('username', req.body.username).fetch().then(function(exists) {
-      console.log(exists);
-      if (exists) {
-        console.log('user exists');
-        res.redirect('/');  
+    User.where('username', req.body.username).fetch().then(function(user) {
+      console.log(user);
+      if (user) {
+        console.log('user exists, check password');
+        user.checkPassword(req.body.password, user.attributes.password)
+          .then(function(match) {
+            if (match) {
+              res.redirect('/');
+            } else {
+              res.redirect('/login');
+            }
+          })
+          .catch(function(err) {
+            res.redirect('/login');
+          });
       } else {
-        console.log('user does not exist');
+        console.log('user does not exist, wrong username');
         res.redirect('/login'); 
       }
-      
     });
   });
 
