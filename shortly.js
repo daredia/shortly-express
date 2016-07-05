@@ -62,9 +62,7 @@ function(req, res) {
 app.get('/links', restrict,
 function(req, res) {
   Links.reset().fetch().then(function(links) {
-    //console.log('links inside /links 1:', links);
-    Link.where({'uid': req.session.user}).fetch().then(function(queryLinks) {
-      console.log('links inside /links 2:', queryLinks);
+    Link.where({'uid': req.session.user}).fetchAll().then(function(queryLinks) {
       res.status(200).send(queryLinks);
     });
   });
@@ -79,9 +77,8 @@ function(req, res) {
     return res.sendStatus(404);
   }
 
-  new Link({ url: uri, uid: req.session.user }).fetch().then(function(found) {
-    if (found) {
-      console.log('found is true:', found);
+  new Link({url: uri}).fetch().then(function(found) {
+    if (found && found.attributes.uid === req.session.user) {
       res.status(200).send(found.attributes);
     } else {
       util.getUrlTitle(uri, function(err, title) {
@@ -89,7 +86,6 @@ function(req, res) {
           console.log('Error reading URL heading: ', err);
           return res.sendStatus(404);
         }
-        console.log('current session user is ', req.session.user);
         Links.create({
           url: uri,
           title: title,
@@ -97,7 +93,6 @@ function(req, res) {
           uid: req.session.user
         })
         .then(function(newLink) {
-          console.log('new link', newLink);
           res.status(200).send(newLink);
         });
       });
@@ -109,21 +104,18 @@ function(req, res) {
 // Write your authentication routes here
 /************************************************************/
 app.get('/login', function(req, res) {
-  console.log('open login page');
   res.render('login');
 });
 app.post('/login',
   function(req, res) {
     User.where('username', req.body.username).fetch().then(function(user) {
-      console.log(user);
       if (user) {
-        console.log('user exists, check password');
+        //console.log('user exists, check password');
         user.checkPassword(req.body.password, user.attributes.password)
           .then(function(match) {
             if (match) {
-              console.log('password matched');
+              //console.log('password matched');
               req.session.regenerate(function() {
-                console.log('in request.session.regenerate');
                 req.session.user = user.attributes.id;
                 res.redirect('/');
               });
@@ -135,7 +127,7 @@ app.post('/login',
             res.redirect('/login');
           });
       } else {
-        console.log('user does not exist, wrong username');
+        //console.log('user does not exist, wrong username');
         res.redirect('/login'); 
       }
     });

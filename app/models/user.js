@@ -8,10 +8,6 @@ var User = db.Model.extend({
     this.on('creating', this.hashPassword, this);
   },
   hashPassword: function(model, attrs, options) {
-    // console.log('model:', model);
-    // console.log('attrs:', attrs);
-    // console.log('options:', options);
-
     // return a promise to saving event handler before storing hash password
     return new Promise(function(resolve, reject) {
       bcrypt.genSalt(10, function(err, salt) {

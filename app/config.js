@@ -32,7 +32,7 @@ db.knex.schema.hasTable('urls').then(function(exists) {
       link.integer('uid');
       link.timestamps();
     }).then(function (table) {
-      console.log('Created Table', table);
+      console.log('Created URLS Table', table);
     });
   }
 });
@@ -44,7 +44,7 @@ db.knex.schema.hasTable('clicks').then(function(exists) {
       click.integer('linkId');
       click.timestamps();
     }).then(function (table) {
-      console.log('Created Table', table);
+      console.log('Created CLICKS Table', table);
     });
   }
 });
