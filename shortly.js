@@ -62,7 +62,11 @@ function(req, res) {
 app.get('/links', restrict,
 function(req, res) {
   Links.reset().fetch().then(function(links) {
-    res.status(200).send(links.models);
+    //console.log('links inside /links 1:', links);
+    Link.where({'uid': req.session.user}).fetch().then(function(queryLinks) {
+      console.log('links inside /links 2:', queryLinks);
+      res.status(200).send(queryLinks);
+    });
   });
 });
 
@@ -75,8 +79,9 @@ function(req, res) {
     return res.sendStatus(404);
   }
 
-  new Link({ url: uri }).fetch().then(function(found) {
+  new Link({ url: uri, uid: req.session.user }).fetch().then(function(found) {
     if (found) {
+      console.log('found is true:', found);
       res.status(200).send(found.attributes);
     } else {
       util.getUrlTitle(uri, function(err, title) {
@@ -84,7 +89,7 @@ function(req, res) {
           console.log('Error reading URL heading: ', err);
           return res.sendStatus(404);
         }
-        console.log("current session user is ", req.session.user);
+        console.log('current session user is ', req.session.user);
         Links.create({
           url: uri,
           title: title,
@@ -92,7 +97,7 @@ function(req, res) {
           uid: req.session.user
         })
         .then(function(newLink) {
-          console.log('made a new link');
+          console.log('new link', newLink);
           res.status(200).send(newLink);
         });
       });
@@ -119,7 +124,7 @@ app.post('/login',
               console.log('password matched');
               req.session.regenerate(function() {
                 console.log('in request.session.regenerate');
-                req.session.user = user.attributes.username;
+                req.session.user = user.attributes.id;
                 res.redirect('/');
               });
             } else {

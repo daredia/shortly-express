@@ -8,6 +8,18 @@ var knex = require('knex')({
 });
 var db = require('bookshelf')(knex);
 
+// console.log('dropping tables');
+// db.knex.schema.dropTable('users').then(function() {
+//   console.log('dropped users');
+// });
+// db.knex.schema.dropTable('urls').then(function() {
+//   console.log('dropped urls');
+// });
+// db.knex.schema.dropTable('clicks').then(function() {
+//   console.log('dropped clicks');
+// });
+
+// console.log('starting tables');
 db.knex.schema.hasTable('urls').then(function(exists) {
   if (!exists) {
     db.knex.schema.createTable('urls', function (link) {
@@ -17,6 +29,7 @@ db.knex.schema.hasTable('urls').then(function(exists) {
       link.string('code', 100);
       link.string('title', 255);
       link.integer('visits');
+      link.integer('uid');
       link.timestamps();
     }).then(function (table) {
       console.log('Created Table', table);
