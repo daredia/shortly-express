@@ -6,7 +6,7 @@ var bodyParser = require('body-parser');
 //sessions no longer needs cookie parser for it to work since 1.5.0
 var session = require('express-session');
 
-// require('node-monkey').start({ host: '127.0.0.1', port: '50500'});
+require('node-monkey').start({ host: '127.0.0.1', port: '50500'});
 
 var db = require('./app/config');
 var Users = require('./app/collections/users');
