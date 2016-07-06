@@ -104,7 +104,8 @@ function(req, res) {
 // Write your authentication routes here
 /************************************************************/
 app.get('/login', function(req, res) {
-  res.render('login');
+  console.log('in get request for /login');
+  res.render('login', {error: ''});
 });
 app.post('/login',
   function(req, res) {
@@ -120,15 +121,15 @@ app.post('/login',
                 res.redirect('/');
               });
             } else {
-              res.redirect('/login');
+              res.render('login', {error: ' failed, please try again'});
             }
           })
           .catch(function(err) {
-            res.redirect('/login');
+            res.render('login', {error: ' failed, please try again'});
           });
       } else {
         //console.log('user does not exist, wrong username');
-        res.redirect('/login'); 
+        res.render('login', {error: ' failed, please try again'}); 
       }
     });
   });
